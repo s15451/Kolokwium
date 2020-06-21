@@ -73,7 +73,15 @@ namespace Kolokwium.Controllers
                 return BadRequest("No such event exists");
             }
 
-            var 
+            var artistEvent = db.ArtistsEvents
+                                .Where(ae => ae.IdArtist.Equals(request.IdArtist) && ae.IdEvent.Equals(request.IdEvent))
+                                .Select(ae => new
+                                {
+                                    IdArtist = ae.IdArtist,
+                                    IdEvent = ae.IdEvent,
+                                    PerformanceDate = ae.PerformanceDate
+                                });
+                                
 
             return Ok();
         }
