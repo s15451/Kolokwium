@@ -38,7 +38,8 @@ namespace Kolokwium.Controllers
                                 Nickname = a.Nickname,
                                 PerformanceDate = a.PerformanceDate
                             })
-                            .OrderByDescending(a => a.PerformanceDate);
+                            .OrderByDescending(a => a.PerformanceDate)
+                            .ToList();
 
             return Ok(result);
         }
@@ -48,6 +49,31 @@ namespace Kolokwium.Controllers
         {
             var db = _artistsDbContext;
 
+            var EventTimes = db.Events
+                               .Join(db.ArtistsEvents, Event => Event.IdEvent, ArtistEvent => ArtistEvent.IdEvent, (Event, ArtistEvent) => new
+                               {
+                                   idEvent = Event.IdEvent,
+                                   StartDate = Event.StartDate,
+                                   EndDate = Event.EndDate,
+                                   PerformanceDate = ArtistEvent.PerformanceDate
+                               })
+                               .Where(e => e.idEvent.Equals(request.IdEvent) &&
+                                            e.StartDate < request.PerformanceDate && e.EndDate > request.PerformanceDate)
+                               .Select(e => new
+                               {
+                                   IdEvent = e.idEvent,
+                                   StartDate = e.StartDate,
+                                   EndDate = e.EndDate,
+                                   PerformanceDate = e.PerformanceDate
+                               })
+                               .ToList();
+
+            if (EventTimes.Count.Equals(0)) 
+            {
+                return BadRequest("No such event exists");
+            }
+
+            var 
 
             return Ok();
         }
